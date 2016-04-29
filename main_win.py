@@ -5,6 +5,7 @@ import datetime
 # import PyQt4 QtCore and QtGui modules
 from PyQt4 import QtCore, QtGui
 from PyQt4 import uic
+from PyQt4.QtGui import QFileDialog
 from PyQt4.phonon import Phonon
 
 (Ui_MainWindow, QMainWindow) = uic.loadUiType('testIntui.ui')
@@ -24,7 +25,9 @@ class MainWindow(QMainWindow):
             Phonon.MediaSource('/home/liss/Музыка/Темный_мир.mp3'))
         self.connect(self.ui.playButton, QtCore.SIGNAL("clicked()"), self.play)
         self.connect(self.ui.nextButton, QtCore.SIGNAL("clicked()"), self.pause)
+        self.connect(self.ui.actionOpenFile_s, QtCore.SIGNAL("clicked()"), self.open())
         self.ui.horizontalSlider.valueChanged.connect(self.slider_value_change)
+
 
     def __del__(self):
         self.ui = None
@@ -49,10 +52,11 @@ class MainWindow(QMainWindow):
     """
 
     def slider_value_change(self):
-        if self.m_media.state() == Phonon.PlayingState or self.m_media.state() == Phonon.PausedState:
-            value = self.ui.horizontalSlider.value()
-            print(value)
-            self.m_media.seek(value)
+        #if self.m_media.state() == Phonon.PlayingState or self.m_media.state() == Phonon.PausedState:
+        value = self.ui.horizontalSlider.value()
+        print(value)
+        self.m_media.seek(value)
+        self.m_media.play()
 
     def delayedInit(self):
         if not self.m_media:
@@ -99,23 +103,14 @@ class MainWindow(QMainWindow):
         key = input("Enter Captcha {0}: ".format(captcha.get_url())).strip()
         return captcha.try_again(key)
 
-    """"
+
     def open(self):
         dialog = QFileDialog()
         dialog.setViewMode(QFileDialog.Detail)
         filename = dialog.getOpenFileName(self,
                                           'Open audio file', '/home',
                                           "Audio Files (*.mp3 *.wav *.ogg)")[0]
-        self.audio_output = Phonon.AudioOutput(Phonon.MusicCategory, self)
-        Phonon.createPath(self.media_obj, self.audio_output)
-        self.media_obj.setCurrentSource(Phonon.MediaSource(filename))
-        self.media_obj.tick.connect(self.time_change)
-        self.media_obj.totalTimeChanged.connect(self.total_time_change)
-        self.media_obj.play()
-        self.button.setEnabled(True)
-        self.button.setText("Pause")
-        self.horizontalSlider.setEnabled(True)
-    """
+
 
 
 # -----------------------------------------------------#
