@@ -1,31 +1,58 @@
 #!-*-coding:utf-8-*-
 import sys
 import vk_api
+import datetime
 # import PyQt4 QtCore and QtGui modules
 from PyQt4 import QtCore, QtGui
 from PyQt4 import uic
 from PyQt4.phonon import Phonon
-from vk_player.testIntui import Ui_MainWindow
-(UI_WIN, QMainWindow) = uic.loadUiType('testIntui.ui')
+
+(Ui_MainWindow, QMainWindow) = uic.loadUiType('testIntui.ui')
 
 class MainWindow(QMainWindow):
     """MainWindow inherits QMainWindow"""
     song_list = []
+
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.m_media = None
+        self.delayedInit()
         self.getMyPlaylist()
-        self.connect(self.ui.playButton, QtCore.SIGNAL("clicked()"),self.play)
+        self.m_media.setCurrentSource(
+            Phonon.MediaSource('/home/liss/Музыка/Темный_мир.mp3'))
+        self.connect(self.ui.playButton, QtCore.SIGNAL("clicked()"), self.play)
+        self.connect(self.ui.nextButton, QtCore.SIGNAL("clicked()"), self.pause)
+        self.ui.horizontalSlider.valueChanged.connect(self.slider_value_change)
+
     def __del__(self):
         self.ui = None
 
     def play(self):
-        self.delayedInit()
+        print(self.m_media.state())
+        if self.m_media.state() == Phonon.PlayingState:
+            self.m_media.pause()
+        elif self.m_media.state() == Phonon.PausedState or self.m_media.state() == Phonon.StoppedState:
+            self.m_media.play()
+        # self.m_media.state() == Phonon.PausedState or
+
+    def pause(self):
+        self.m_media.pause()
+
+    """
+    def stop(self):
+        self.m_media.stop()                     #остановить и пересоздать ресурс для проигрывания сначала
         self.m_media.setCurrentSource(
-            Phonon.MediaSource("http://cs1-46v4.vk-cdn.net/p5/83c719ba814630.mp3?extra=B5NUFFVl2-vMP697kI0JzuTZ3AHKI1ddLR_NQ2d5WAfitZNU0Af3RqGJDg04c179ZKTMGWUHVQiLwZ-RVICAUT-uQrou4Lhw-seUoBLdbwj1UACn9muNiKgeQLf_dS3P2NA0TrHD"))
-        self.m_media.play()
+        Phonon.MediaSource(
+            "https://cs9-15v4.vk.me/p5/437ded476b919e.mp3?extra=3nV5RppDS-MPkNVZlYbcUxJ7KUQrtwVEhG6JYT769UWZY1Rp_UMd1aj3V2W3oVzDUYkBf20RMHTBTBIsHlJICqdWXJbCeoe0esH8R0bRzXm39A6soFXJYpMn2QA4wZ7VS2Avw1Lz"))
+    """
+
+    def slider_value_change(self):
+        if self.m_media.state() == Phonon.PlayingState or self.m_media.state() == Phonon.PausedState:
+            value = self.ui.horizontalSlider.value()
+            print(value)
+            self.m_media.seek(value)
 
     def delayedInit(self):
         if not self.m_media:
@@ -35,10 +62,11 @@ class MainWindow(QMainWindow):
 
     def getMyPlaylist(self):
         login, password = 'liseyna1@gmail.com', '9tWmMmJCJk!'
-        vk_session = vk_api.VkApi(login, password)
+
+        vk_session = vk_api.VkApi(login, password, captcha_handler=self.capcha)
 
         try:
-          vk_session.authorization()
+            vk_session.authorization()
         except vk_api.AuthorizationError as error_msg:
             print(error_msg)
             return
@@ -55,14 +83,42 @@ class MainWindow(QMainWindow):
         print('Posts count:', count)
         for song in audio['items']:
             self.song_list.append(song)
-        n = 0 #Номер строки
+        n = 0  # Номер строки
 
-        self.ui.tableWidget.setColumnCount(1)
+        self.ui.tableWidget.setColumnCount(3)
         self.ui.tableWidget.setRowCount(count)
         for n in range(count):
-            self.ui.tableWidget.setItem(n,0, QtGui.QTableWidgetItem(str(self.song_list[n]['artist'])+'\t'+str(self.song_list[n]['title'])+'\t'+str(self.song_list[n]['duration'])))
+            self.ui.tableWidget.setItem(n, 0, QtGui.QTableWidgetItem(
+                str(self.song_list[n]['artist'])))
+            self.ui.tableWidget.setItem(n, 1, QtGui.QTableWidgetItem(
+                str(self.song_list[n]['title'])))
+            self.ui.tableWidget.setItem(n, 2, QtGui.QTableWidgetItem(
+                str(datetime.timedelta(seconds=self.song_list[n]['duration']))))
 
-#-----------------------------------------------------#
+    def capcha(self, captcha):
+        key = input("Enter Captcha {0}: ".format(captcha.get_url())).strip()
+        return captcha.try_again(key)
+
+    """"
+    def open(self):
+        dialog = QFileDialog()
+        dialog.setViewMode(QFileDialog.Detail)
+        filename = dialog.getOpenFileName(self,
+                                          'Open audio file', '/home',
+                                          "Audio Files (*.mp3 *.wav *.ogg)")[0]
+        self.audio_output = Phonon.AudioOutput(Phonon.MusicCategory, self)
+        Phonon.createPath(self.media_obj, self.audio_output)
+        self.media_obj.setCurrentSource(Phonon.MediaSource(filename))
+        self.media_obj.tick.connect(self.time_change)
+        self.media_obj.totalTimeChanged.connect(self.total_time_change)
+        self.media_obj.play()
+        self.button.setEnabled(True)
+        self.button.setText("Pause")
+        self.horizontalSlider.setEnabled(True)
+    """
+
+
+# -----------------------------------------------------#
 if __name__ == '__main__':
     # create application
     app = QtGui.QApplication(sys.argv)

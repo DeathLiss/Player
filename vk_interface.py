@@ -23,7 +23,6 @@ class MainWindow(QMainWindow):
 
     def play(self, index):
         self.delayedInit()
-        #self.m_media.setCurrentSource(self.m_model.filePath(index))
         self.m_media.setCurrentSource(
             Phonon.MediaSource(self.m_model.filePath(index)))
         #
