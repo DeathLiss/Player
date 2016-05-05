@@ -10,9 +10,11 @@ from PyQt4.phonon import Phonon
 
 (Ui_MainWindow, QMainWindow) = uic.loadUiType('testIntui.ui')
 
+
 class MainWindow(QMainWindow):
     """MainWindow inherits QMainWindow"""
     song_list = []
+    song_list_local = []
 
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
@@ -20,25 +22,36 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.m_media = None
         self.delayedInit()
-        self.getMyPlaylist()
-        self.m_media.setCurrentSource(
-            Phonon.MediaSource('/home/liss/Музыка/Темный_мир.mp3'))
+        #self.getMyPlaylist()
         self.connect(self.ui.playButton, QtCore.SIGNAL("clicked()"), self.play)
         self.connect(self.ui.nextButton, QtCore.SIGNAL("clicked()"), self.pause)
-        self.connect(self.ui.actionOpenFile_s, QtCore.SIGNAL("clicked()"), self.open())
+        self.ui.actionOpenFile_s.triggered.connect(self.open)
         self.ui.horizontalSlider.valueChanged.connect(self.slider_value_change)
-
 
     def __del__(self):
         self.ui = None
 
+    def initSource(self, filename):
+        self.m_media.setCurrentSource(
+            Phonon.MediaSource(filename))
+        self.play()
+
+    def alert(msg, icon=QtGui.QMessageBox.Warning):
+        d = QtGui.QMessageBox()
+        d.setWindowTitle('AutoCanary')
+        # d.setText(msg)
+        # d.setIcon(icon)
+        d.exec_()
+
     def play(self):
+        print(len(self.song_list_local))
+        if len(self.song_list_local) == 0:
+            self.alert("Warning! No songs in playlist")
         print(self.m_media.state())
         if self.m_media.state() == Phonon.PlayingState:
             self.m_media.pause()
         elif self.m_media.state() == Phonon.PausedState or self.m_media.state() == Phonon.StoppedState:
             self.m_media.play()
-        # self.m_media.state() == Phonon.PausedState or
 
     def pause(self):
         self.m_media.pause()
@@ -52,7 +65,7 @@ class MainWindow(QMainWindow):
     """
 
     def slider_value_change(self):
-        #if self.m_media.state() == Phonon.PlayingState or self.m_media.state() == Phonon.PausedState:
+        # if self.m_media.state() == Phonon.PlayingState or self.m_media.state() == Phonon.PausedState:
         value = self.ui.horizontalSlider.value()
         print(value)
         self.m_media.seek(value)
@@ -103,14 +116,13 @@ class MainWindow(QMainWindow):
         key = input("Enter Captcha {0}: ".format(captcha.get_url())).strip()
         return captcha.try_again(key)
 
-
     def open(self):
         dialog = QFileDialog()
         dialog.setViewMode(QFileDialog.Detail)
-        filename = dialog.getOpenFileName(self,
-                                          'Open audio file', '/home',
-                                          "Audio Files (*.mp3 *.wav *.ogg)")[0]
-
+        self.song_list_local = dialog.getOpenFileNames(self,
+                                                  'Open audio file', '/home',
+                                                  "Audio Files (*.mp3 *.wav *.ogg)")
+        self.initSource(self.song_list_local[0])
 
 
 # -----------------------------------------------------#

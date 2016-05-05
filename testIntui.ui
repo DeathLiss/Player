@@ -6,19 +6,48 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>454</width>
-    <height>600</height>
+    <width>630</width>
+    <height>658</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>130</y>
+      <width>451</width>
+      <height>491</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Плейлист</string>
+    </property>
+    <widget class="QTableWidget" name="tableWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>431</width>
+       <height>391</height>
+      </rect>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::DoubleClicked</set>
+     </property>
+     <property name="showGrid">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>0</y>
+      <x>170</x>
+      <y>20</y>
       <width>451</width>
       <height>101</height>
      </rect>
@@ -89,34 +118,15 @@
      </property>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox_2">
+   <widget class="QTreeView" name="treeView">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>100</y>
-      <width>451</width>
-      <height>471</height>
+      <x>10</x>
+      <y>20</y>
+      <width>151</width>
+      <height>601</height>
      </rect>
     </property>
-    <property name="title">
-     <string>Плейлист</string>
-    </property>
-    <widget class="QTableWidget" name="tableWidget">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>431</width>
-       <height>391</height>
-      </rect>
-     </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::DoubleClicked</set>
-     </property>
-     <property name="showGrid">
-      <bool>false</bool>
-     </property>
-    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -124,7 +134,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>454</width>
+     <width>630</width>
      <height>21</height>
     </rect>
    </property>
