@@ -12,7 +12,7 @@ m_model = QDirModel()
 def main():
     """ Пример получения последнего сообщения со стены """
 
-    login, password = 'liseyna1@gmail.com', '9tWmMmJCJk!'
+    login, password = 'lis@gmail.com', ''
     vk_session = vk_api.VkApi(login, password)
 
     try:
