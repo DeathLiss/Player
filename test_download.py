@@ -6,6 +6,7 @@ song_list = []
 class Main:
 
     def getMyPlaylist(self):  # плейлист из вконтакте
+        # данные аккаунта ВК
         login, password = 'lis@gmail.com', 'lalla'
 
         vk_session = vk_api.VkApi(login, password, captcha_handler=self.capcha)
